@@ -1,16 +1,40 @@
 package br.com.alura.LiterAlura.model;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "autores")
 public class Autor {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(unique = true)
     private String nome;
+    @OneToMany(mappedBy = "autor", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Livro> livros  = new ArrayList<>();
     private Integer dtNascimento;
     private Integer dtFalecimento;
 
-    public Autor(DadosLivros dados) {
+    private Autor(){}
+
+    public Autor (DadosLivros dados) {
         this.nome = dados.livros().getFirst().autor().getFirst().nome();
         this.dtNascimento = dados.livros().getFirst().autor().getFirst().dtNascimento();
         this.dtFalecimento = dados.livros().getFirst().autor().getFirst().dtFalecimento();
+    }
+
+    public List<Livro> getLivros() {
+        return livros;
+    }
+
+    public void setLivros(List<Livro> livros) {
+        this.livros = livros;
     }
 
     public Integer getDtFalecimento() {
@@ -37,10 +61,19 @@ public class Autor {
         this.nome = nome;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
-        return "Autor: " + nome + " | " +
-                "Ano de nascimento: " + dtNascimento + " | " +
-                "Ano de falecimento: " + dtFalecimento;
+        return "Autor: " + nome + "\n" +
+                "Ano de nascimento: " + dtNascimento + "\n" +
+                "Ano de falecimento: " + dtFalecimento + "\n" +
+                "Livros: " + livros.stream().map(l -> l.getTitulo()).toList();
     }
 }
