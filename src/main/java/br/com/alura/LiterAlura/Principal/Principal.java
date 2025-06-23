@@ -3,16 +3,26 @@ package br.com.alura.LiterAlura.Principal;
 import br.com.alura.LiterAlura.model.Autor;
 import br.com.alura.LiterAlura.model.DadosLivros;
 import br.com.alura.LiterAlura.model.Livro;
+import br.com.alura.LiterAlura.repository.AutorRepository;
+import br.com.alura.LiterAlura.repository.LivroRepository;
 import br.com.alura.LiterAlura.service.ConsumoAPI;
 import br.com.alura.LiterAlura.service.ConverteDados;
 
+import java.util.Optional;
 import java.util.Scanner;
 
 public class Principal {
     private Scanner sc = new Scanner(System.in);
     private ConsumoAPI consumoAPI = new ConsumoAPI();
     private ConverteDados converteDados = new ConverteDados();
-    private final String ENDERECO = "http://gutendex.com/books/?search=dickens%20great";
+    private final String ENDERECO = "http://gutendex.com/books/?search=";
+    private LivroRepository livroRepository;
+    private AutorRepository autorRepository;
+
+    public Principal(LivroRepository livroRepository, AutorRepository autorRepository) {
+        this.livroRepository = livroRepository;
+        this.autorRepository = autorRepository;
+    }
 
     public void menu(){
 
@@ -38,8 +48,10 @@ public class Principal {
                     buscarLivroPorTitulo();
                     break;
                 case 2:
+                    listarLivrosRegistrados();
                     break;
                 case 3:
+                    listarAutoresRegistrados();
                     break;
                 case 4:
                     break;
@@ -54,12 +66,27 @@ public class Principal {
     }
 }
 
+    private void listarLivrosRegistrados() {
+        var livros = livroRepository.findAll();
+        livros.forEach(System.out::println);
+    }
+
+    private void listarAutoresRegistrados() {
+        var autores = autorRepository.findAll();
+        autores.forEach(System.out::println);
+    }
+
     private void buscarLivroPorTitulo() {
-        var json = consumoAPI.obterDados(ENDERECO);
+        System.out.println("Insira o nome do livro que você deseja procurar:");
+        var nomeLivro = sc.nextLine();
+
+        var json = consumoAPI.obterDados(ENDERECO + nomeLivro.replace(" ", "%20").trim());
         DadosLivros dados = converteDados.obterDados(json, DadosLivros.class);
-        Livro livro = new Livro(dados);
         Autor autor = new Autor(dados);
-        System.out.println(livro);
-        System.out.println(autor);
+        Livro livro = new Livro(dados);
+        livro.setAutor(autor);
+        autorRepository.save(autor);
+        livroRepository.save(livro);
+
     }
     }
