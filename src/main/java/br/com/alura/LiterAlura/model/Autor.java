@@ -23,10 +23,10 @@ public class Autor {
 
     private Autor(){}
 
-    public Autor (DadosLivros dados) {
-        this.nome = dados.livros().getFirst().autor().getFirst().nome();
-        this.dtNascimento = dados.livros().getFirst().autor().getFirst().dtNascimento();
-        this.dtFalecimento = dados.livros().getFirst().autor().getFirst().dtFalecimento();
+    public Autor (DadosAutor dados) {
+        this.nome = dados.nome();
+        this.dtNascimento = dados.dtNascimento();
+        this.dtFalecimento = dados.dtFalecimento();
     }
 
     public List<Livro> getLivros() {

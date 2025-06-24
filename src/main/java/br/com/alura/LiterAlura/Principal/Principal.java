@@ -1,17 +1,18 @@
 package br.com.alura.LiterAlura.Principal;
 
-import br.com.alura.LiterAlura.model.Autor;
-import br.com.alura.LiterAlura.model.DadosLivros;
-import br.com.alura.LiterAlura.model.Livro;
+import br.com.alura.LiterAlura.model.*;
 import br.com.alura.LiterAlura.repository.AutorRepository;
 import br.com.alura.LiterAlura.repository.LivroRepository;
 import br.com.alura.LiterAlura.service.ConsumoAPI;
 import br.com.alura.LiterAlura.service.ConverteDados;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 import java.util.Scanner;
 
 public class Principal {
+    private static final Logger log = LoggerFactory.getLogger(Principal.class);
     private Scanner sc = new Scanner(System.in);
     private ConsumoAPI consumoAPI = new ConsumoAPI();
     private ConverteDados converteDados = new ConverteDados();
@@ -82,11 +83,14 @@ public class Principal {
 
         var json = consumoAPI.obterDados(ENDERECO + nomeLivro.replace(" ", "%20").trim());
         DadosLivros dados = converteDados.obterDados(json, DadosLivros.class);
-        Autor autor = new Autor(dados);
-        Livro livro = new Livro(dados);
-        livro.setAutor(autor);
-        autorRepository.save(autor);
-        livroRepository.save(livro);
+
+        Optional<DadosLivro> livroOptional = dados.livros().stream().findFirst();
+        Optional<DadosAutor> autorOptional = dados.livros().stream().findFirst().map(l -> l.autor().getFirst());
+        if (livroOptional.isPresent() && autorOptional.isPresent()){
+            Livro livro = new Livro(livroOptional.get());
+            Autor autor = new Autor(autorOptional.get());
+            livro.setAutor(autor);
+        }
 
     }
     }

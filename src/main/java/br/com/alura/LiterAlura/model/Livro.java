@@ -21,10 +21,10 @@ public class Livro {
 
     public Livro(){}
 
-    public Livro(DadosLivros dados) {
-        this.titulo = dados.livros().getFirst().titulo();
-        this.totalDownloads = dados.livros().getFirst().totalDownloads();
-        this.idioma = dados.livros().getFirst().idioma().getFirst();
+    public Livro(DadosLivro dados) {
+        this.titulo = dados.titulo();
+        this.totalDownloads = dados.totalDownloads();
+        this.idioma = dados.idioma().getFirst();
     }
 
     public Autor getAutor() {
